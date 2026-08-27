@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morse Code Translator / モールス信号変換ツール</title>
+<meta name="description" content="文字とモールス信号を相互変換。音で再生することもできます。">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4214020669195548"
+     crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg: #100e18; --card: #1a1826; --text: #f3f1fa; --sub: #9d97b8;
+    --accent: #22d3ee; --accent2: #fbbf24; --border: #262440;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Hiragino Kaku Gothic ProN", "Segoe UI", Arial, sans-serif;
+    background: var(--bg); color: var(--text); padding: 16px;
+  }
+  .wrap { max-width: 520px; margin: 0 auto; }
+  .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .home-link { font-size: 22px; text-decoration: none; line-height: 1; }
+  .lang-btn { background: none; border: 1px solid var(--border); color: var(--sub); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+  h1 { font-size: 21px; text-align: center; margin: 4px 0 4px; }
+  .lead { text-align: center; color: var(--sub); font-size: 13px; margin-bottom: 18px; line-height: 1.6; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .tabs button {
+    flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 8px;
+    background: none; color: var(--sub); font-size: 13px; cursor: pointer;
+  }
+  .tabs button.active { background: var(--accent); color: #052024; border-color: var(--accent); font-weight: bold; }
+  textarea {
+    width: 100%; min-height: 90px; padding: 12px; font-size: 15px; border: 1px solid var(--border);
+    border-radius: 10px; background: #120f1e; color: var(--text); resize: vertical; font-family: inherit;
+  }
+  .arrow { text-align: center; font-size: 20px; color: var(--sub); margin: 10px 0; }
+  .output-box {
+    background: #120f1e; border: 1px solid var(--border); border-radius: 10px; padding: 14px;
+    font-size: 18px; font-family: monospace; word-break: break-all; min-height: 30px;
+  }
+  .btn-row { display: flex; gap: 8px; margin-top: 10px; }
+  .btn-row button {
+    flex: 1; padding: 11px; border: 1px solid var(--border); border-radius: 10px;
+    font-size: 13.5px; cursor: pointer; background: none; color: var(--text);
+  }
+  .btn-row .play-btn { background: var(--accent); color: #052024; font-weight: bold; border: none; }
+  .footer-links { text-align: center; font-size: 12px; color: var(--sub); margin-top: 4px; line-height: 1.8; }
+  .footer-links a { color: var(--accent2); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-row"><a href="https://naginata-work.github.io/" class="home-link" title="All tools">🧰</a><button class="lang-btn" id="langBtn">EN</button></div>
+  <h1 id="title">📡 モールス信号変換ツール</h1>
+  <p class="lead" id="lead">文字とモールス信号を相互変換。音での再生もできます。</p>
+
+  <div class="card">
+    <div class="tabs">
+      <button id="tabToMorse" class="active"></button>
+      <button id="tabToText"></button>
+    </div>
+    <textarea id="inputText" placeholder=""></textarea>
+    <div class="arrow">↓</div>
+    <div class="output-box" id="output">-</div>
+    <div class="btn-row">
+      <button class="play-btn" id="playBtn"></button>
+      <button id="copyBtn"></button>
+    </div>
+  </div>
+
+  <p class="footer-links" id="footerLinks"></p>
+</div>
+
+<script>
+  const MORSE_MAP = {
+    A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....',
+    I: '..', J: '.---', K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.',
+    Q: '--.-', R: '.-.', S: '...', T: '-', U: '..-', V: '...-', W: '.--', X: '-..-',
+    Y: '-.--', Z: '--..', '0': '-----', '1': '.----', '2': '..---', '3': '...--',
+    '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.',
+    '.': '.-.-.-', ',': '--..--', '?': '..--..', "'": '.----.', '!': '-.-.--',
+    '/': '-..-.', '(': '-.--.', ')': '-.--.-', '&': '.-...', ':': '---...',
+    ';': '-.-.-.', '=': '-...-', '+': '.-.-.', '-': '-....-', '_': '..--.-',
+    '"': '.-..-.', '$': '...-..-', '@': '.--.-.'
+  };
+  const REVERSE_MORSE = Object.fromEntries(Object.entries(MORSE_MAP).map(([k, v]) => [v, k]));
+
+  function textToMorse(text) {
+    return text.toUpperCase().split(' ').map(word =>
+      [...word].map(ch => MORSE_MAP[ch] || '').filter(Boolean).join(' ')
+    ).join(' / ');
+  }
+
+  function morseToText(morse) {
+    return morse.trim().split(' / ').map(word =>
+      word.trim().split(/\s+/).map(code => REVERSE_MORSE[code] || '').join('')
+    ).join(' ');
+  }
+
+  const I18N = {
+    ja: {
+      title: '📡 モールス信号変換ツール',
+      lead: '文字とモールス信号を相互変換。音での再生もできます。',
+      tabToMorse: '文字 → モールス信号',
+      tabToText: 'モールス信号 → 文字',
+      placeholderToMorse: '変換したい文字を入力...',
+      placeholderToText: 'モールス信号を入力(例: .... . .-.. .-.. ---)',
+      playBtn: '音で再生',
+      copyBtn: 'コピー',
+      copied: 'コピーしました!',
+      footerLinks: '他のツールも作っています → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">おしゃれ文字変換</a> / <a href="https://naginata-work.github.io/emoji-search/" target="_blank" rel="noopener">絵文字検索</a>'
+    },
+    en: {
+      title: '📡 Morse Code Translator',
+      lead: 'Convert text to Morse code and back. You can also play it as sound.',
+      tabToMorse: 'Text → Morse',
+      tabToText: 'Morse → Text',
+      placeholderToMorse: 'Type text to convert...',
+      placeholderToText: 'Enter Morse code (e.g. .... . .-.. .-.. ---)',
+      playBtn: 'Play sound',
+      copyBtn: 'Copy',
+      copied: 'Copied!',
+      footerLinks: 'Also made these → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">Fancy Text Generator</a> / <a href="https://naginata-work.github.io/emoji-search/" target="_blank" rel="noopener">Emoji Search</a>'
+    }
+  };
+
+  function loadLang() { try { return localStorage.getItem('morseCodeLang'); } catch (e) { return null; } }
+  function saveLang(l) { try { localStorage.setItem('morseCodeLang', l); } catch (e) {} }
+  let lang = loadLang() === 'en' ? 'en' : 'ja';
+  function t() { return I18N[lang]; }
+
+  let mode = 'toMorse';
+  let currentOutput = '';
+
+  function convert() {
+    const input = document.getElementById('inputText').value;
+    currentOutput = mode === 'toMorse' ? textToMorse(input) : morseToText(input);
+    document.getElementById('output').textContent = currentOutput || '-';
+  }
+
+  document.getElementById('inputText').addEventListener('input', convert);
+
+  function setMode(m, btnId) {
+    mode = m;
+    ['tabToMorse', 'tabToText'].forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById(btnId).classList.add('active');
+    document.getElementById('inputText').placeholder = m === 'toMorse' ? t().placeholderToMorse : t().placeholderToText;
+    document.getElementById('inputText').value = '';
+    convert();
+  }
+  document.getElementById('tabToMorse').addEventListener('click', () => setMode('toMorse', 'tabToMorse'));
+  document.getElementById('tabToText').addEventListener('click', () => setMode('toText', 'tabToText'));
+
+  let audioCtx = null;
+  function playMorse(morse) {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const unit = 0.09;
+    let t0 = audioCtx.currentTime + 0.1;
+    for (const ch of morse) {
+      if (ch === '.') {
+        beepAt(t0, unit);
+        t0 += unit * 2;
+      } else if (ch === '-') {
+        beepAt(t0, unit * 3);
+        t0 += unit * 4;
+      } else if (ch === ' ') {
+        t0 += unit * 2;
+      } else if (ch === '/') {
+        t0 += unit * 4;
+      }
+    }
+  }
+  function beepAt(startTime, duration) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.value = 600;
+    gain.gain.setValueAtTime(0.25, startTime);
+    gain.gain.setValueAtTime(0.25, startTime + duration - 0.01);
+    gain.gain.linearRampToValueAtTime(0, startTime + duration);
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+  }
+
+  document.getElementById('playBtn').addEventListener('click', () => {
+    const morse = mode === 'toMorse' ? currentOutput : document.getElementById('inputText').value;
+    if (!morse) return;
+    playMorse(morse);
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    if (!currentOutput) return;
+    try {
+      await navigator.clipboard.writeText(currentOutput);
+      const btn = document.getElementById('copyBtn');
+      const original = btn.textContent;
+      btn.textContent = t().copied;
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    } catch { alert(currentOutput); }
+  });
+
+  function renderStaticText() {
+    document.getElementById('title').textContent = t().title;
+    document.getElementById('lead').textContent = t().lead;
+    document.getElementById('tabToMorse').textContent = t().tabToMorse;
+    document.getElementById('tabToText').textContent = t().tabToText;
+    document.getElementById('inputText').placeholder = mode === 'toMorse' ? t().placeholderToMorse : t().placeholderToText;
+    document.getElementById('playBtn').textContent = t().playBtn;
+    document.getElementById('copyBtn').textContent = t().copyBtn;
+    document.getElementById('footerLinks').innerHTML = t().footerLinks;
+    convert();
+  }
+
+  document.getElementById('langBtn').addEventListener('click', () => {
+    lang = lang === 'ja' ? 'en' : 'ja';
+    saveLang(lang);
+    document.getElementById('langBtn').textContent = lang === 'ja' ? 'EN' : 'JA';
+    renderStaticText();
+  });
+
+  document.getElementById('langBtn').textContent = lang === 'ja' ? 'EN' : 'JA';
+  renderStaticText();
+</script>
+</body>
+</html>
