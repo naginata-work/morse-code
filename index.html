@@ -69,7 +69,25 @@
     </div>
   </div>
 
+  <div class="card" style="font-size:13px; line-height:1.9; color:var(--sub);">
+    <h2 id="aboutTitle" style="font-size:15px; color:var(--text); margin:0 0 8px;"></h2>
+    <p id="aboutBody1" style="margin:0 0 10px;"></p>
+    <p id="aboutBody2" style="margin:0;"></p>
+  </div>
+
+  <div class="card" style="font-size:13px; line-height:1.9; color:var(--sub);">
+    <h2 id="faqTitle" style="font-size:15px; color:var(--text); margin:0 0 10px;"></h2>
+    <p id="faq1Q" style="margin:0 0 4px; color:var(--text); font-weight:bold;"></p>
+    <p id="faq1A" style="margin:0 0 12px;"></p>
+    <p id="faq2Q" style="margin:0 0 4px; color:var(--text); font-weight:bold;"></p>
+    <p id="faq2A" style="margin:0;"></p>
+  </div>
+
   <p class="footer-links" id="footerLinks"></p>
+  <p style="text-align:center; font-size:11px; color:var(--sub); margin-top:4px;">
+    <a href="https://naginata-work.github.io/" style="color:var(--sub);" id="allToolsLink"></a> ・
+    <a href="https://naginata-work.github.io/privacy.html" style="color:var(--sub);" id="privacyLink"></a>
+  </p>
 </div>
 
 <script>
@@ -109,7 +127,15 @@
       playBtn: '音で再生',
       copyBtn: 'コピー',
       copied: 'コピーしました!',
-      footerLinks: '他のツールも作っています → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">おしゃれ文字変換</a> / <a href="https://naginata-work.github.io/emoji-search/" target="_blank" rel="noopener">絵文字検索</a>'
+      footerLinks: '他のツールも作っています → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">おしゃれ文字変換</a> / <a href="https://naginata-work.github.io/emoji-search/" target="_blank" rel="noopener">絵文字検索</a>',
+      aboutTitle: 'モールス信号について',
+      aboutBody1: 'モールス信号は、19世紀に電信のために作られた、短点(トン)と長点(ツー)の組み合わせで文字を表す符号です。無線が主流の通信手段だった時代の名残ですが、今でもアマチュア無線や一部の非常用通信、教養として学ぶ場面で使われています。',
+      aboutBody2: '文字を入力すればモールス信号に、モールス信号(半角のピリオドとハイフンで入力)を入力すれば文字に、それぞれ変換されます。「音で再生」ボタンを押すと、実際のモールス信号のリズムで音が鳴るので、耳で聞いて覚える練習にも使えます。',
+      faqTitle: 'よくある質問',
+      faq1Q: 'モールス信号の入力はどんな記号を使えばいい?',
+      faq1A: '短点は半角ピリオド(.)、長点は半角ハイフン(-)で入力してください。文字と文字の間はスペース1つ、単語と単語の間はスペースの前後に「/」を入れて区切ります(例: ".... ." は「HE」)。',
+      faq2Q: '対応していない文字はある?',
+      faq2A: 'アルファベット(A-Z)・数字(0-9)・主要な記号(. , ? ! など)に対応しています。日本語のひらがな・カタカナ・漢字には対応していません。',
     },
     en: {
       title: '📡 Morse Code Translator',
@@ -121,7 +147,15 @@
       playBtn: 'Play sound',
       copyBtn: 'Copy',
       copied: 'Copied!',
-      footerLinks: 'Also made these → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">Fancy Text Generator</a> / <a href="https://naginata-work.github.io/emoji-search/" target="_blank" rel="noopener">Emoji Search</a>'
+      footerLinks: 'Also made these → <a href="https://naginata-work.github.io/fancy-text/" target="_blank" rel="noopener">Fancy Text Generator</a> / <a href="https://naginata-work.github.io/emoji-search/" target="_blank" rel="noopener">Emoji Search</a>',
+      aboutTitle: 'About Morse code',
+      aboutBody1: "Morse code was created in the 19th century for the telegraph, encoding letters as combinations of short (dot) and long (dash) signals. It's largely obsolete as a communication method now, but still shows up in amateur radio, some emergency signaling, and as a bit of general knowledge.",
+      aboutBody2: 'Type text to get Morse code, or type Morse code (using periods and hyphens) to get text back. The "Play sound" button plays it back at authentic Morse timing, which doubles as practice for learning to recognize it by ear.',
+      faqTitle: 'FAQ',
+      faq1Q: 'What characters do I use to type Morse code?',
+      faq1A: 'Use a period (.) for a dot and a hyphen (-) for a dash. Separate letters with a single space, and separate words with " / " (for example, ".... ." decodes to "HE").',
+      faq2Q: "Are there characters it doesn't support?",
+      faq2A: "It covers the alphabet (A-Z), digits (0-9), and common punctuation (. , ? ! and more). Japanese hiragana, katakana, and kanji aren't supported.",
     }
   };
 
@@ -210,6 +244,18 @@
     document.getElementById('playBtn').textContent = t().playBtn;
     document.getElementById('copyBtn').textContent = t().copyBtn;
     document.getElementById('footerLinks').innerHTML = t().footerLinks;
+    document.getElementById('aboutTitle').textContent = t().aboutTitle;
+    document.getElementById('aboutBody1').textContent = t().aboutBody1;
+    document.getElementById('aboutBody2').textContent = t().aboutBody2;
+    document.getElementById('faqTitle').textContent = t().faqTitle;
+    document.getElementById('faq1Q').textContent = t().faq1Q;
+    document.getElementById('faq1A').textContent = t().faq1A;
+    document.getElementById('faq2Q').textContent = t().faq2Q;
+    document.getElementById('faq2A').textContent = t().faq2A;
+    document.getElementById('allToolsLink').textContent = lang === 'ja' ? '他のツール一覧' : 'All tools';
+    document.getElementById('allToolsLink').href = 'https://naginata-work.github.io/';
+    document.getElementById('privacyLink').textContent = lang === 'ja' ? 'プライバシーポリシー' : 'Privacy policy';
+    document.getElementById('privacyLink').href = 'https://naginata-work.github.io/privacy.html';
     convert();
   }
 
